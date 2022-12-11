@@ -6,7 +6,8 @@ In  this stage we build a  Siamese Network and fitted it on Fruit 360 dataset to
 
 
 Before ruinning the code install requirements.txt by running following command in terminal <br>```pip install -r requirements.txt ``` <br>
-
-After installing packages you want run siamese network in jupyter notebook.
-
 To download the data please click the [Link](https://www.kaggle.com/datasets/moltean/fruits)
+
+After installing packages and dowloading the dataset you can run siamese network in jupyter notebook.
+
+
