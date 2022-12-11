@@ -5,6 +5,6 @@ In  this stage we build a  Siamese Network and fitted it on Fruit 360 dataset to
 
 
 
-Before ruinning the code install requirements.txt by running followin command in terminal """ sadasd """,
+Before ruinning the code install requirements.txt by running followin command in terminal ```sadasd ```
 and run siamese network in jupyter notebook
 To download the data please click the [Link](https://www.kaggle.com/datasets/moltean/fruits)
