@@ -94,7 +94,7 @@ def get_dataset(path,transforms,SiameseNetworkDataset,num_workers,batch_size,shu
     siamese_dataset = SiameseNetworkDataset(imageFolderDataset=folder_dataset,
                                             transform=transforms)
     dataloader = DataLoader(siamese_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=shuffle)
-    return dataloader
+    return dataloader, siamese_dataset
 
 def intersection(same,different):
     no_of_intersection = []
