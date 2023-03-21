@@ -24,6 +24,11 @@ def joinpath(rootdir, targetdir):
     return os.path.join(os.sep, rootdir + os.sep, targetdir)
 
 
+"""
+It will read two images and return them, as well as their label. 
+If they are in the same category, i.e. the same person, 
+it will return 0, and otherwise, it will return 1.
+"""
 
 class SiameseNetworkDataset(Dataset):   
     def __init__(self,imageFolderDataset,transform=None):
@@ -65,6 +70,11 @@ class SiameseNetworkDataset(Dataset):
     def __len__(self):
         return len(self.imageFolderDataset.imgs)
 
+
+"""
+It will read one image at a time and return its label based on the folder it is present
+"""
+
 class SiameseNetworkDataset_for_test(Dataset):
     def __init__(self,imageFolderDataset,transform=None):
         self.imageFolderDataset = imageFolderDataset    
@@ -89,21 +99,51 @@ class SiameseNetworkDataset_for_test(Dataset):
     def __len__(self):
         return len(self.imageFolderDataset.imgs)
 
+
 def get_dataset(path,transforms,SiameseNetworkDataset,num_workers,batch_size,shuffle):
+    """
+    This function gets the path and get dataset by applying transformation 
+    and load the data using dataloader
+    """
     folder_dataset = datasets.ImageFolder(root=path)
     siamese_dataset = SiameseNetworkDataset(imageFolderDataset=folder_dataset,
                                             transform=transforms)
     dataloader = DataLoader(siamese_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=shuffle)
     return dataloader, siamese_dataset
 
+
 def intersection(same,different):
+    """
+    This returns the number of intersection 
+    between images belonging to same class and different class
+    """
     no_of_intersection = []
 
-    for i in same_disssimilarity:
-        if i > min(different_disssimilarity):
-            intersection.append(i)
-    for j in different_disssimilarity:
-        if j < max(same_disssimilarity):
-            intersection.append(j)
+    for i in same:
+        if i > min(different):
+            no_of_intersection.append(i)
+    for j in different:
+        if j < max(same):
+            no_of_intersection.append(j)
 
     return no_of_intersection
+
+
+def threshold(same,different,score):
+    """
+    Returns list of missclassified images based on the 
+    given threshold score.
+    """
+    final_list = []
+    same_misclassified = []
+    different_misclassified = []
+    for s in same:
+        if s > score:
+            final_list.append(s)
+            same_misclassified.append(s)
+    for d in different:
+        if d <= score:
+            final_list.append(d)
+            different_misclassified.append(d)
+    
+    return final_list, same_misclassified, different_misclassified
