@@ -100,6 +100,42 @@ class SiameseNetworkDataset_for_test(Dataset):
         return len(self.imageFolderDataset.imgs)
 
 
+class TripletDataset(Dataset):
+    def __init__(self,imageFolderDataset, transform=None):
+        self.imageFolderDataset = imageFolderDataset    
+        self.transform = transform
+    
+    def __getitem__(self, item):
+        anchor_img_tuple = random.choice(self.imageFolderDataset.imgs)
+        anchor_label = anchor_img_tuple[1]
+        
+        while True:
+            positive_img_tuple = random.choice(self.imageFolderDataset.imgs)
+            positive_label = positive_img_tuple[1]
+            if positive_label == anchor_label:
+                break
+        
+        while True:
+            negative_img_tuple = random.choice(self.imageFolderDataset.imgs)
+            negative_label = negative_img_tuple[1]
+            if negative_label != anchor_label:
+                break
+
+        anchor_img = Image.open(anchor_img_tuple[0])
+        positive_img = Image.open(positive_img_tuple[0])
+        negative_img = Image.open(negative_img_tuple[0])
+
+        if self.transform is not None:
+            anchor_img = self.transform(anchor_img)
+            positive_img = self.transform(positive_img)
+            negative_img = self.transform(negative_img)
+
+        return anchor_img, positive_img, negative_img, anchor_label, positive_label, negative_label
+    
+    def __len__(self):
+        return len(self.imageFolderDataset.imgs)
+
+
 def get_dataset(path,transforms,SiameseNetworkDataset,num_workers,batch_size,shuffle):
     """
     This function gets the path and get dataset by applying transformation 
