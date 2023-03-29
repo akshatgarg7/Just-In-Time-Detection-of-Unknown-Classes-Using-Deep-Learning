@@ -24,58 +24,127 @@ def joinpath(rootdir, targetdir):
     return os.path.join(os.sep, rootdir + os.sep, targetdir)
 
 
+class NetworkDataset(Dataset):
+    def __init__(self,imageFolderDataset,flag,transform=None):
+        self.imageFolderDataset = imageFolderDataset    
+        self.transform = transform
+        self.flag = flag
+    
+    def __len__(self):
+        return len(self.imageFolderDataset.imgs)
+    
+    def __getitem__(self,index):
+        if self.flag == "contrastive":
+            img0_tuple = random.choice(self.imageFolderDataset.imgs)
+
+            #We need to approximately 50% of images to be in the same class
+            should_get_same_class = random.randint(0,1) 
+            if should_get_same_class:
+                while True:
+                    #Look untill the same class image is found
+                    img1_tuple = random.choice(self.imageFolderDataset.imgs) 
+                    if img0_tuple[1] == img1_tuple[1]:
+                        break
+            else:
+
+                while True:
+                    #Look untill a different class image is found
+                    img1_tuple = random.choice(self.imageFolderDataset.imgs) 
+                    if img0_tuple[1] != img1_tuple[1]:
+                        break
+
+            img0 = Image.open(img0_tuple[0])
+            img1 = Image.open(img1_tuple[0])
+            
+            #Convert to grayscake
+    #         img0 = img0.convert("L")
+    #         img1 = img1.convert("L")
+
+            if self.transform is not None:
+                img0 = self.transform(img0)
+                img1 = self.transform(img1)
+            
+            return img0, img1, torch.from_numpy(np.array([int(img1_tuple[1] != img0_tuple[1])], dtype=np.float32))
+        
+        elif self.flag == "triplet":
+            anchor_img_tuple = random.choice(self.imageFolderDataset.imgs)
+            anchor_label = anchor_img_tuple[1]
+            
+            while True:
+                positive_img_tuple = random.choice(self.imageFolderDataset.imgs)
+                positive_label = positive_img_tuple[1]
+                if positive_label == anchor_label:
+                    break
+            
+            while True:
+                negative_img_tuple = random.choice(self.imageFolderDataset.imgs)
+                negative_label = negative_img_tuple[1]
+                if negative_label != anchor_label:
+                    break
+
+            anchor_img = Image.open(anchor_img_tuple[0])
+            positive_img = Image.open(positive_img_tuple[0])
+            negative_img = Image.open(negative_img_tuple[0])
+
+            if self.transform is not None:
+                anchor_img = self.transform(anchor_img)
+                positive_img = self.transform(positive_img)
+                negative_img = self.transform(negative_img)
+
+            return anchor_img, positive_img, negative_img, anchor_label, positive_label, negative_label
+
 """
 It will read two images and return them, as well as their label. 
 If they are in the same category, i.e. the same person, 
 it will return 0, and otherwise, it will return 1.
 """
 
-class SiameseNetworkDataset(Dataset):   
-    def __init__(self,imageFolderDataset,transform=None):
-        self.imageFolderDataset = imageFolderDataset    
-        self.transform = transform
+# class SiameseNetworkDataset(Dataset):   
+#     def __init__(self,imageFolderDataset,transform=None):
+#         self.imageFolderDataset = imageFolderDataset    
+#         self.transform = transform
         
-    def __getitem__(self,index):
-        img0_tuple = random.choice(self.imageFolderDataset.imgs)
+#     def __getitem__(self,index):
+#         img0_tuple = random.choice(self.imageFolderDataset.imgs)
 
-        #We need to approximately 50% of images to be in the same class
-        should_get_same_class = random.randint(0,1) 
-        if should_get_same_class:
-            while True:
-                #Look untill the same class image is found
-                img1_tuple = random.choice(self.imageFolderDataset.imgs) 
-                if img0_tuple[1] == img1_tuple[1]:
-                    break
-        else:
+#         #We need to approximately 50% of images to be in the same class
+#         should_get_same_class = random.randint(0,1) 
+#         if should_get_same_class:
+#             while True:
+#                 #Look untill the same class image is found
+#                 img1_tuple = random.choice(self.imageFolderDataset.imgs) 
+#                 if img0_tuple[1] == img1_tuple[1]:
+#                     break
+#         else:
 
-            while True:
-                #Look untill a different class image is found
-                img1_tuple = random.choice(self.imageFolderDataset.imgs) 
-                if img0_tuple[1] != img1_tuple[1]:
-                    break
+#             while True:
+#                 #Look untill a different class image is found
+#                 img1_tuple = random.choice(self.imageFolderDataset.imgs) 
+#                 if img0_tuple[1] != img1_tuple[1]:
+#                     break
 
-        img0 = Image.open(img0_tuple[0])
-        img1 = Image.open(img1_tuple[0])
+#         img0 = Image.open(img0_tuple[0])
+#         img1 = Image.open(img1_tuple[0])
         
-        #Convert to grayscake
-#         img0 = img0.convert("L")
-#         img1 = img1.convert("L")
+#         #Convert to grayscake
+# #         img0 = img0.convert("L")
+# #         img1 = img1.convert("L")
 
-        if self.transform is not None:
-            img0 = self.transform(img0)
-            img1 = self.transform(img1)
+#         if self.transform is not None:
+#             img0 = self.transform(img0)
+#             img1 = self.transform(img1)
         
-        return img0, img1, torch.from_numpy(np.array([int(img1_tuple[1] != img0_tuple[1])], dtype=np.float32))
+#         return img0, img1, torch.from_numpy(np.array([int(img1_tuple[1] != img0_tuple[1])], dtype=np.float32))
     
-    def __len__(self):
-        return len(self.imageFolderDataset.imgs)
+#     def __len__(self):
+#         return len(self.imageFolderDataset.imgs)
 
 
 """
 It will read one image at a time and return its label based on the folder it is present
 """
 
-class SiameseNetworkDataset_for_test(Dataset):
+class TestNetworkDataset(Dataset):
     def __init__(self,imageFolderDataset,transform=None):
         self.imageFolderDataset = imageFolderDataset    
         self.transform = transform
@@ -100,49 +169,50 @@ class SiameseNetworkDataset_for_test(Dataset):
         return len(self.imageFolderDataset.imgs)
 
 
-class TripletDataset(Dataset):
-    def __init__(self,imageFolderDataset, transform=None):
-        self.imageFolderDataset = imageFolderDataset    
-        self.transform = transform
+# class TripletDataset(Dataset):
+#     def __init__(self,imageFolderDataset, transform=None):
+#         self.imageFolderDataset = imageFolderDataset    
+#         self.transform = transform
     
-    def __getitem__(self, item):
-        anchor_img_tuple = random.choice(self.imageFolderDataset.imgs)
-        anchor_label = anchor_img_tuple[1]
+#     def __getitem__(self, item):
+#         anchor_img_tuple = random.choice(self.imageFolderDataset.imgs)
+#         anchor_label = anchor_img_tuple[1]
         
-        while True:
-            positive_img_tuple = random.choice(self.imageFolderDataset.imgs)
-            positive_label = positive_img_tuple[1]
-            if positive_label == anchor_label:
-                break
+#         while True:
+#             positive_img_tuple = random.choice(self.imageFolderDataset.imgs)
+#             positive_label = positive_img_tuple[1]
+#             if positive_label == anchor_label:
+#                 break
         
-        while True:
-            negative_img_tuple = random.choice(self.imageFolderDataset.imgs)
-            negative_label = negative_img_tuple[1]
-            if negative_label != anchor_label:
-                break
+#         while True:
+#             negative_img_tuple = random.choice(self.imageFolderDataset.imgs)
+#             negative_label = negative_img_tuple[1]
+#             if negative_label != anchor_label:
+#                 break
 
-        anchor_img = Image.open(anchor_img_tuple[0])
-        positive_img = Image.open(positive_img_tuple[0])
-        negative_img = Image.open(negative_img_tuple[0])
+#         anchor_img = Image.open(anchor_img_tuple[0])
+#         positive_img = Image.open(positive_img_tuple[0])
+#         negative_img = Image.open(negative_img_tuple[0])
 
-        if self.transform is not None:
-            anchor_img = self.transform(anchor_img)
-            positive_img = self.transform(positive_img)
-            negative_img = self.transform(negative_img)
+#         if self.transform is not None:
+#             anchor_img = self.transform(anchor_img)
+#             positive_img = self.transform(positive_img)
+#             negative_img = self.transform(negative_img)
 
-        return anchor_img, positive_img, negative_img, anchor_label, positive_label, negative_label
+#         return anchor_img, positive_img, negative_img, anchor_label, positive_label, negative_label
     
-    def __len__(self):
-        return len(self.imageFolderDataset.imgs)
+#     def __len__(self):
+#         return len(self.imageFolderDataset.imgs)
 
 
-def get_dataset(path,transforms,SiameseNetworkDataset,num_workers,batch_size,shuffle):
+def get_dataset(path,transforms,SiameseNetworkDataset,flag,num_workers,batch_size,shuffle):
     """
     This function gets the path and get dataset by applying transformation 
     and load the data using dataloader
     """
     folder_dataset = datasets.ImageFolder(root=path)
     siamese_dataset = SiameseNetworkDataset(imageFolderDataset=folder_dataset,
+                                            flag=flag,
                                             transform=transforms)
     dataloader = DataLoader(siamese_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=shuffle)
     return dataloader, siamese_dataset
