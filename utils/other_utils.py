@@ -145,9 +145,10 @@ It will read one image at a time and return its label based on the folder it is 
 """
 
 class TestNetworkDataset(Dataset):
-    def __init__(self,imageFolderDataset,transform=None):
+    def __init__(self,imageFolderDataset,flag,transform=None):
         self.imageFolderDataset = imageFolderDataset    
         self.transform = transform
+        self.flag = flag
         
     def __getitem__(self,index):
         img0_tuple = self.imageFolderDataset.imgs[index] # one image
