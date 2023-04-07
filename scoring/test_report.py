@@ -15,7 +15,7 @@ def test_report(net, device, dataloader, dataloader_size, dict, threshold):
         start_time_image = time.time()
         img, label = next(dataiter)
         
-        if label[0] in ['s5','s6','s7']:
+        if label[0] in ['s5','s6','s7','Unknown Class']:
             actual.append('Unknown Class')
         else:
             actual.append(label[0])
