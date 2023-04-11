@@ -2,9 +2,14 @@ import time
 import numpy as np
 from sklearn.metrics import classification_report
 from tqdm.notebook import tqdm
-from embeddings.n_way_shot_learning import n_way_shot_learning
+from embeddings.n_way_shot_learning_mean import n_way_shot_learning
+from embeddings.n_way_shot_learning_all import n_way_shot_learning_all
 
-def test_report(net, device, dataloader, dataloader_size, dict, threshold):
+
+from utils.other_utils import joinpath, get_class_names
+
+def test_report(PATH, net, device, dataloader, dataloader_size, dict, threshold, embed_flag, k=10):
+    known_class = get_class_names(joinpath(PATH,'train'))
     start_time = time.time()
 
     actual = []
@@ -16,12 +21,15 @@ def test_report(net, device, dataloader, dataloader_size, dict, threshold):
         start_time_image = time.time()
         img, label = next(dataiter)
         
-        if label[0] in ['s5','s6','s7','Unknown Class']:
-            actual.append('Unknown Class')
-        else:
+        if label[0] in known_class:
             actual.append(label[0])
+        else:
+            actual.append('Unknown Class')
         
-        predicted.append(n_way_shot_learning(net, device, img, dict, threshold))
+        if embed_flag == 'all':
+            predicted.append(n_way_shot_learning_all(net, device, img, dict, threshold, k))
+        else:
+            predicted.append(n_way_shot_learning(net, device, img, dict, threshold))
         end_time_image = time.time()
         avg_time_image.append(end_time_image-start_time_image)
 

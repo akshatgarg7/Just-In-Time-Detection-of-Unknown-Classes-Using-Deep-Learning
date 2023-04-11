@@ -191,3 +191,16 @@ def threshold(same,different,score):
             different_misclassified.append(d)
     
     return final_list, same_misclassified, different_misclassified
+
+
+def get_class_names(training_path):
+    
+    """
+    Get all the training labels from train directory
+    """
+    
+    class_names = []
+    for entry in os.scandir(training_path):
+        if entry.is_dir():
+            class_names.append(entry.name)
+    return class_names

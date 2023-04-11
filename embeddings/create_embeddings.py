@@ -13,6 +13,7 @@ def create_embeddings(net,device,dataloader,dataloader_size):
     for i in range(len(dataloader_size)):
         img,label = next(dataiter)
         img = img.to(device)
-        embeddings_dict[label[0]].append(net.forward_once(img))
+        embeddings = net.forward_once(img)
+        embeddings_dict[label[0]].append(embeddings)
 
     return embeddings_dict
