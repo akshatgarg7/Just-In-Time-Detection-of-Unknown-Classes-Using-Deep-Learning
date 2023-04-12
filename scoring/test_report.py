@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.metrics import classification_report
 from tqdm.notebook import tqdm
 from embeddings.n_way_shot_learning_mean import n_way_shot_learning
-from embeddings.n_way_shot_learning_all import n_way_shot_learning_all
+from embeddings.top_k_selection import top_k_selection
+from embeddings.base_prediction import base_prediction
 
 
 from utils.other_utils import joinpath, get_class_names
@@ -27,7 +28,9 @@ def test_report(PATH, net, device, dataloader, dataloader_size, dict, threshold,
             actual.append('Unknown Class')
         
         if embed_flag == 'all':
-            predicted.append(n_way_shot_learning_all(net, device, img, dict, threshold, k))
+            predicted.append(top_k_selection(net, device, img, dict, threshold, k))
+        elif embed_flag == 'base':
+            predicted.append(base_prediction(net, device, img, dict, threshold))
         else:
             predicted.append(n_way_shot_learning(net, device, img, dict, threshold))
         end_time_image = time.time()
