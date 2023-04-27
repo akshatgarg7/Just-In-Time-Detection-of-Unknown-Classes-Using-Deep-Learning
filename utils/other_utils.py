@@ -1,5 +1,5 @@
 import os
-import matplotlib.pyplot as plt
+from datetime import datetime
 import numpy as np
 import random
 from PIL import Image
@@ -21,9 +21,15 @@ def joinpath(rootdir, targetdir):
     """
     Joins the the rootdir and targetdir
     """
-    return os.path.join(os.sep, rootdir + os.sep, targetdir)
+    # return os.path.join(os.sep, rootdir + os.sep, targetdir)
+    return os.path.join(os.path.abspath(rootdir), targetdir)
 
-
+def resultjoinpath(rootdir,resultdir,epochs,batch_size):
+    _,result_name = os.path.split(rootdir)
+    now = datetime.now()
+    result_name = result_name + '_' + str(epochs) + '_' + str(batch_size) + '_' + now.strftime("%m_%d_%Y_%H_%M")
+    return joinpath(resultdir, result_name)
+    
 
 """
 It will read two images and return them, as well as their label. 
