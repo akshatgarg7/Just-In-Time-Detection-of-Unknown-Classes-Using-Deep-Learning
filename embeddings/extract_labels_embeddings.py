@@ -1,5 +1,3 @@
-import torch
-
 def extract_labels_and_embeddings(input_dict):
     labels = []
     embeddings = []

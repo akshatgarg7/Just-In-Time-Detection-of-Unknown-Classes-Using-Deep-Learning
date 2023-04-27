@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 
 class TripletLoss(nn.Module):
     def __init__(self, margin=1.0):

@@ -1,13 +1,4 @@
-import torchvision
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset
-import torchvision.utils
-import torch
-from torch.autograd import Variable
 import torch.nn as nn
-from torch import optim
-import torch.nn.functional as F
   
 #create the Siamese Neural Network
 class SiameseNetwork(nn.Module):

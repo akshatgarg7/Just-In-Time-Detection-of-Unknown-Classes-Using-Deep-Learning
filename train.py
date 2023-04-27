@@ -19,7 +19,7 @@ from losses.cosine import ContrastiveLossCosine
 from losses.triplet import TripletLoss
 
 from utils.vis_utils import example_vis
-from utils.other_utils import joinpath, resultjoinpath, NetworkDataset, TestNetworkDataset, get_dataset
+from utils.other_utils import joinpath, resultjoinpath, NetworkDataset, get_dataset
 
 
 # Suppress all warnings

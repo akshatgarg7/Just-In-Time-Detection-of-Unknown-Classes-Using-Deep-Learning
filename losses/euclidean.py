@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-import numpy as np
 
 class ContrastiveLoss(torch.nn.Module):
     def __init__(self, margin=2.0):

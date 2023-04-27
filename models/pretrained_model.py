@@ -38,9 +38,10 @@
 #         output1 = self.forward_once(input1)
 #         output2 = self.forward_once(input2)
 #         return output1, output2
-import torch
+
 import torch.nn as nn
 import torchvision.models as models
+
 class SiameseNetwork(nn.Module):
     def __init__(self):
         super(SiameseNetwork, self).__init__()

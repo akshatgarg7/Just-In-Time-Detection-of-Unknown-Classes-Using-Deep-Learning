@@ -117,16 +117,9 @@
 #         output2 = self.forward_once(input2)
 #         return output1, output2
 
-import torchvision
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset
-import torchvision.utils
-import torch
-from torch.autograd import Variable
+
+
 import torch.nn as nn
-from torch import optim
-import torch.nn.functional as F
 
 # New architecture, TODO: still in testing
 class NewSiameseNetwork(nn.Module):

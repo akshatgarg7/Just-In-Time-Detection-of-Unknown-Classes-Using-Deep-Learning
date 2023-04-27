@@ -1,7 +1,5 @@
 import torch
 import torch.nn.functional as F
-import heapq
-from collections import Counter
 from embeddings.extract_labels_embeddings import extract_labels_and_embeddings
 
 def base_prediction(net, device, image, embedding_dict, threshold):
