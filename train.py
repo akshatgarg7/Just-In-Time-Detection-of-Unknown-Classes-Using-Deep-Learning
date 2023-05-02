@@ -77,11 +77,13 @@ def contrastive_train(net,optimizer,criterion,epochs,train_dataloader,valid_data
 
 def triplet_train(net,optimizer,criterion,epochs,train_dataloader,valid_dataloader):
     loss_history = []
+    valid_loss_history = []
     for epoch in tqdm(range(epochs), desc='Epochs'):
         # Iterate over batches
-        for step, (anchor_img, positive_img, negative_img,_,_,_) in enumerate(train_dataloader,0):
+        for step, ((anchor_img, positive_img, negative_img,_,_,_),(anchor_valid_img, positive_valid_img, negative_valid_img,_,_,_)) in enumerate(zip(train_dataloader,valid_dataloader),0):
             # Send the images and labels to CUDA
             anchor_img, positive_img, negative_img = anchor_img.to(device), positive_img.to(device), negative_img.to(device)
+            anchor_valid_img, positive_valid_img, negative_valid_img = anchor_valid_img.to(device), positive_valid_img.to(device), negative_valid_img.to(device)
             
             # Zero the gradients
             optimizer.zero_grad()
@@ -90,9 +92,14 @@ def triplet_train(net,optimizer,criterion,epochs,train_dataloader,valid_dataload
             anchor_out = net.forward_once(anchor_img)
             positive_out = net.forward_once(positive_img)
             negative_out = net.forward_once(negative_img)
+
+            anchor_valid_out = net.forward_once(anchor_valid_img)
+            positive_valid_out = net.forward_once(positive_valid_img)
+            negative_valid_out = net.forward_once(negative_valid_img)
             
             # Pass the outputs of the networks and label into the loss function
             loss_triplet = criterion(anchor_out, positive_out, negative_out)
+            loss_valid_triplet = criterion(anchor_valid_out, positive_valid_out, negative_valid_out)
 
             # Calculate the backpropagation
             loss_triplet.backward()
@@ -101,7 +108,8 @@ def triplet_train(net,optimizer,criterion,epochs,train_dataloader,valid_dataload
             optimizer.step()
         # save the loss history for each epoch
         loss_history.append(loss_triplet.item())
-    return loss_history
+        valid_loss_history.append(loss_valid_triplet.item())
+    return loss_history,valid_loss_history
 
 def main():
 
@@ -115,7 +123,7 @@ def main():
     nchannel = args.n_channel
     FLAG = args.loss_flag
     BATCH_SIZE = args.batch_size
-    MODEL_PATH = resultjoinpath(PATH,args.save_dir,args.epochs,BATCH_SIZE)
+    MODEL_PATH = resultjoinpath(PATH,args.save_dir,args.epochs,BATCH_SIZE,args.loss_flag)
     if not os.path.exists(MODEL_PATH):
         os.makedirs(MODEL_PATH)
 
@@ -125,9 +133,11 @@ def main():
     valid_dataloader,valid_size = get_dataset(joinpath(PATH,'valid'), nchannel, transformations(args.rotation),NetworkDataset,FLAG,0,BATCH_SIZE,True)
     
     net = pretrained_model.SiameseNetwork().to(device)
+    # net = NewSiameseNetwork().to(device)
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
     if FLAG == 'contrastive':
-        criterion = ContrastiveLoss()
+        # criterion = ContrastiveLoss()
+        criterion = ContrastiveLossCosine()
     elif FLAG == 'triplet':
         criterion = TripletLoss()
 
@@ -137,7 +147,7 @@ def main():
         train_loss, valid_loss= contrastive_train(net, optimizer, criterion, args.epochs, train_dataloader, valid_dataloader)
         # _, train_loss = train()
     elif FLAG == 'triplet':
-        train_loss = triplet_train(net, optimizer, criterion, args.epochs, train_dataloader, valid_dataloader)
+        train_loss, valid_loss = triplet_train(net, optimizer, criterion, args.epochs, train_dataloader, valid_dataloader)
         # Make sure to also calculate valid_loss for the triplet case
     print("training completed")
     print("---------------------------------------------------------------------------------------")

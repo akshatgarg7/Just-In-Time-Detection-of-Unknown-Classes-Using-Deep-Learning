@@ -16,10 +16,10 @@ def joinpath(rootdir, targetdir):
     # return os.path.join(os.sep, rootdir + os.sep, targetdir)
     return os.path.join(os.path.abspath(rootdir), targetdir)
 
-def resultjoinpath(rootdir,resultdir,epochs,batch_size):
+def resultjoinpath(rootdir,resultdir,epochs,batch_size,loss_flag):
     _,result_name = os.path.split(rootdir)
     now = datetime.now()
-    result_name = result_name + '_' + str(epochs) + '_' + str(batch_size) + '_' + now.strftime("%m_%d_%Y_%H_%M")
+    result_name = result_name + '_' + loss_flag + '_' + str(epochs) + '_' + str(batch_size) + '_' + now.strftime("%m_%d_%Y_%H_%M")
     return joinpath(resultdir, result_name)
     
 
