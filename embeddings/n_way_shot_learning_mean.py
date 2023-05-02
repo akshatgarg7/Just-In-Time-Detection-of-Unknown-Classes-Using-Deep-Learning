@@ -4,6 +4,8 @@ import torch.nn.functional as F
 def n_way_shot_learning(net, device, image, embedding_dict, threshold):
     
     output = net.forward_once(image.to(device))
+    print(output)
+    print(output.shape)
     
     labels = list(embedding_dict.keys())
     embedding_tensors = torch.stack(list(embedding_dict.values()))
