@@ -136,8 +136,8 @@ def main():
     # net = NewSiameseNetwork().to(device)
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
     if FLAG == 'contrastive':
-        # criterion = ContrastiveLoss()
-        criterion = ContrastiveLossCosine()
+        criterion = ContrastiveLoss()
+        # criterion = ContrastiveLossCosine()
     elif FLAG == 'triplet':
         criterion = TripletLoss()
 
