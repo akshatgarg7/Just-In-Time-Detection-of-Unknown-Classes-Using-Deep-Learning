@@ -7,6 +7,7 @@ In  this stage we build a  Siamese Network and fitted it on Fruit 360 dataset to
 
 Before ruinning the code install requirements.txt by running following command in terminal <br>```pip install -r requirements.txt ``` <br>
 To download the data please click the [Link](https://www.kaggle.com/datasets/moltean/fruits)
+To read the report please click the [Link](https://github.com/akshatgarg7/Just-In-Time-Detection-of-Unknown-Classes-Using-Deep-Learning/blob/main/Final_Capstone_Report.pdf)
 
 After installing packages and dowloading the dataset you can run siamese network in jupyter notebook.
 
